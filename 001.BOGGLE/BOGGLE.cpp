@@ -16,7 +16,7 @@ const int garrCoord[8] =
     +gnWidth + 1
 };
 
-char* find(char *pBegin, char *pEnd, char nVal)
+inline char* find(char *pBegin, char *pEnd, char nVal)
 {
     while (pBegin != pEnd)
     {
@@ -27,7 +27,7 @@ char* find(char *pBegin, char *pEnd, char nVal)
     return pEnd;
 }
 
-bool step(char *pBoard, char *pStart, char *szWord, char nLength, int nCur)
+inline bool step(char *pBoard, char *pStart, char *szWord, char nLength, int nCur)
 {
     if (nLength == nCur)
         return true;
@@ -42,37 +42,40 @@ bool step(char *pBoard, char *pStart, char *szWord, char nLength, int nCur)
     return false;
 }
 
-void doBoggleGame(char *pBoard, char arrWord[10][11], int nWordCount)
+inline void doBoggleGame(char *pBoard, char arrWord[10][11], int nWordCount)
 {
     char *pBegin = pBoard;
     char *pEnd = pBoard+gnSize;
 
     for (int nWC = 0; nWC < nWordCount; nWC++)
     {
-        std::cout << arrWord[nWC] << std::endl;
         int nLength = strlen(arrWord[nWC]);
-        while (--nLength)
+        bool fGO = true;
+        for (int i = nLength; i >= 0; --i)
         {
-            if (find(pBegin, pEnd, arrWord[nWC][nLength]) == pEnd)
+            if (find(pBegin, pEnd, arrWord[nWC][i]) == pEnd)
             {
                 std::cout << arrWord[nWC] << " NO" << std::endl;
+                fGO = false;
             }
         }
 
-        nLength = strlen(arrWord[nWC]);
-        char *pStart = find(pBegin, pEnd, arrWord[nWC][0]);
-        while (pStart != pEnd)
+        if (fGO)
         {
-            if (step(pBoard, pStart, arrWord[nWC], nLength, 1))
+            char *pStart = find(pBegin, pEnd, arrWord[nWC][0]);
+            while (pStart != pEnd)
             {
-                std::cout << arrWord[nWC] << " YES" << std::endl;
-                break;
+                if (step(pBoard, pStart, arrWord[nWC], nLength, 1))
+                {
+                    std::cout << arrWord[nWC] << " YES" << std::endl;
+                    break;
+                }
+                pStart = find(pStart+1, pEnd, arrWord[nWC][0]);
             }
-            pStart = find(pStart+1, pEnd, arrWord[nWC][0]);
-        }
 
-        if (pStart == pEnd)
-            std::cout << arrWord[nWC] << " NO" << std::endl;
+            if (pStart == pEnd)
+                std::cout << arrWord[nWC] << " NO" << std::endl;
+        }
     }
 }
 
@@ -86,18 +89,16 @@ int main (int argc, char** argv)
     std::cin >> nStageCount;
     while (nStageCount--)
     {
-        memset (arrBoard, 0, sizeof(char)*gnSize);
+        memset (arrBoard, 0, sizeof(arrBoard));
+        memset (arrWord, 0, sizeof(arrWord));
+
         char *pStage = arrBoard + gnWidth + 1;
         for (int i = 0; i < 5; i++)
-        {
             std::cin >> (pStage + i*gnWidth);
-        }
 
         std::cin >> nWordCount;
         for (int i = 0; i < nWordCount; i++)
-        {
             std::cin >> arrWord[i];
-        }
 
         doBoggleGame(arrBoard, arrWord, nWordCount);
     };
