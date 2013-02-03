@@ -1,4 +1,4 @@
-#include <iostream>
+#include <cstdio>
 #include <cstring>
 
 const int gnWidth = 7;
@@ -15,6 +15,8 @@ const int garrCoord[8] =
     +gnWidth + 0,
     +gnWidth + 1
 };
+char garrBoard[gnSize] = {0,};
+char garrWord[10][11] = {0,};
 
 inline char* find(char *pBegin, char *pEnd, char nVal)
 {
@@ -55,7 +57,7 @@ inline void doBoggleGame(char *pBoard, char arrWord[10][11], int nWordCount)
         {
             if (find(pBegin, pEnd, arrWord[nWC][i]) == pEnd)
             {
-                std::cout << arrWord[nWC] << " NO" << std::endl;
+                printf("%s NO\n", arrWord[nWC]);
                 fGO = false;
             }
         }
@@ -67,40 +69,36 @@ inline void doBoggleGame(char *pBoard, char arrWord[10][11], int nWordCount)
             {
                 if (step(pBoard, pStart, arrWord[nWC], nLength, 1))
                 {
-                    std::cout << arrWord[nWC] << " YES" << std::endl;
+                    printf("%s YES\n", arrWord[nWC]);
                     break;
                 }
                 pStart = find(pStart+1, pEnd, arrWord[nWC][0]);
             }
 
             if (pStart == pEnd)
-                std::cout << arrWord[nWC] << " NO" << std::endl;
+                printf("%s NO\n", arrWord[nWC]);
         }
     }
 }
+
 
 int main (int argc, char** argv)
 {
     int nStageCount = 0;
     int nWordCount = 0;
-    char arrBoard[gnSize];
-    char arrWord[10][11];
 
-    std::cin >> nStageCount;
+    scanf("%d", &nStageCount);
     while (nStageCount--)
     {
-        memset (arrBoard, 0, sizeof(arrBoard));
-        memset (arrWord, 0, sizeof(arrWord));
-
-        char *pStage = arrBoard + gnWidth + 1;
+        char *pStage = garrBoard + gnWidth + 1;
         for (int i = 0; i < 5; i++)
-            std::cin >> (pStage + i*gnWidth);
+            scanf("%s", (pStage + i*gnWidth));
 
-        std::cin >> nWordCount;
+        scanf("%d", &nWordCount);
         for (int i = 0; i < nWordCount; i++)
-            std::cin >> arrWord[i];
+            scanf("%s", garrWord[i]);
 
-        doBoggleGame(arrBoard, arrWord, nWordCount);
+        doBoggleGame(garrBoard, garrWord, nWordCount);
     };
 
     return 0;
