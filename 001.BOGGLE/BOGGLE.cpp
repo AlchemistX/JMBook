@@ -16,7 +16,10 @@ const int garrCoord[8] =
     +gnWidth + 1
 };
 char garrBoard[gnSize] = {0,};
-char garrWord[10][11] = {0,};
+char szWord[11] = {0,};
+char *gpBegin = garrBoard;
+char *gpEnd = garrBoard+gnSize;
+char *pStage = garrBoard + gnWidth + 1;
 
 inline char* find(char *pBegin, char *pEnd, char nVal)
 {
@@ -29,76 +32,61 @@ inline char* find(char *pBegin, char *pEnd, char nVal)
     return pEnd;
 }
 
-inline bool step(char *pBoard, char *pStart, char *szWord, char nLength, int nCur)
+inline bool step(char *pStart, char *szWord, char nLength, int nCur)
 {
     if (nLength == nCur)
         return true;
+
+    char *pPos = pStart;
     
     for (int i = 0; i < 8; i++)
     {
-        char *pPos = pStart + garrCoord[i];
+        pPos = pStart + garrCoord[i];
         if (*pPos == szWord[nCur])
-            if (step(pBoard, pPos, szWord, nLength, nCur+1))
+            if (step(pPos, szWord, nLength, nCur+1))
                 return true;
     }
+
     return false;
 }
 
-inline void doBoggleGame(char *pBoard, char arrWord[10][11], int nWordCount)
+inline bool doBoggleGame(char *szWord)
 {
-    char *pBegin = pBoard;
-    char *pEnd = pBoard+gnSize;
+    int nLength = strlen(szWord);
+    char *pStart = gpEnd;
+    for (int i = nLength; i >= 0; --i)
+        if (find(gpBegin, gpEnd, *(szWord+i)) == gpEnd)
+            return false;
 
-    for (int nWC = 0; nWC < nWordCount; nWC++)
+    pStart = find(gpBegin, gpEnd, *szWord);
+    while (pStart != gpEnd)
     {
-        int nLength = strlen(arrWord[nWC]);
-        bool fGO = true;
-        for (int i = nLength; i >= 0; --i)
-        {
-            if (find(pBegin, pEnd, arrWord[nWC][i]) == pEnd)
-            {
-                printf("%s NO\n", arrWord[nWC]);
-                fGO = false;
-            }
-        }
-
-        if (fGO)
-        {
-            char *pStart = find(pBegin, pEnd, arrWord[nWC][0]);
-            while (pStart != pEnd)
-            {
-                if (step(pBoard, pStart, arrWord[nWC], nLength, 1))
-                {
-                    printf("%s YES\n", arrWord[nWC]);
-                    break;
-                }
-                pStart = find(pStart+1, pEnd, arrWord[nWC][0]);
-            }
-
-            if (pStart == pEnd)
-                printf("%s NO\n", arrWord[nWC]);
-        }
+        if (step(pStart, szWord, nLength, 1))
+            return true;
+        pStart = find(pStart+1, gpEnd, *szWord);
     }
+
+    return false;
 }
 
-
-int main (int argc, char** argv)
+int main (int argc, char **argv)
 {
     int nStageCount = 0;
     int nWordCount = 0;
+    int i = 0;
 
     scanf("%d", &nStageCount);
     while (nStageCount--)
     {
-        char *pStage = garrBoard + gnWidth + 1;
-        for (int i = 0; i < 5; i++)
+        for (i = 0; i < 5; i++)
             scanf("%s", (pStage + i*gnWidth));
 
         scanf("%d", &nWordCount);
-        for (int i = 0; i < nWordCount; i++)
-            scanf("%s", garrWord[i]);
-
-        doBoggleGame(garrBoard, garrWord, nWordCount);
+        for (i = 0; i < nWordCount; i++)
+        {
+            scanf("%s", szWord);
+            printf("%s %s\n", szWord, doBoggleGame(szWord) ? "YES" : "NO");
+        }
     };
 
     return 0;
