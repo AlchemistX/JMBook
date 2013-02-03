@@ -1,54 +1,64 @@
 #!/usr/bin/env python
+gnWidth = 7
+gnHeight = 7
+lstCoord = [ -gnWidth-1, -gnWidth-0, -gnWidth+1, -1, +1, gnWidth-1, gnWidth+0, gnWidth+1]
 
-nBoardWidth = 5
-nBoardHeight = 5
+def genSquare(strBoard, nIdx):
+    i = 0
+    while(i < 8):
+        nCoord = lstCoord[i]
+        nTarget = nIdx + nCoord
+        yield nTarget, strBoard[nTarget]
+        i += 1
+    return
 
-# ===========
-# | | | | | |
-# ===========
-# | | | | | |
-# ===========
-# | | | | | |
-# ===========
-# | | | | | |
-# ===========
-# | | | | | |
-# ===========
+def step(strBoard, nStart, strWord, nCur):
+    if nCur == len(strWord):
+        return True
 
-def tr1Dto2D(nIdx):
-    return (nIdx%nBoardWidth, nIdx/nBoardWidth)
+    idx = strBoard.find(strWord[nCur])
+    while (idx > 0):
+        if ( idx != nStart ):
+            for i in lstCoord :
+                if ( idx == (nStart+i) ):
+                   if step(strBoard, idx, strWord, nCur+1) == True:
+                       return True
+                   else:
+                        break
+        idx = strBoard.find(strWord[nCur], idx+1)
 
-def tr2Dto1D(tupCoord):
-    return tupCoord[0] + tupCoord[1] * nBoardWidth
-
-def isConn(strBoard, tupCoord, C):
-    CO = ((tupCoord[0] - 1), (tupCoord[1] - 1))
-    if ((CO[0] >= 0) and (CO[1] >= 0)) : print "upper left"
-    if ((tupCoord[0] - 0) >= 0) and ((tupCoord[1] - 1) >= 0) : print "upper"
-    if ((tupCoord[0] + 1) <  5) and ((tupCoord[1] - 1) >= 0) : print "upper right"
-    if ((tupCoord[0] - 1) >= 0) and ((tupCoord[1] - 0) >= 0) : print "left"
-    if ((tupCoord[0] + 1) <  5) and ((tupCoord[1] - 0) >= 0) : print "right"
-    if ((tupCoord[0] - 1) >= 0) and ((tupCoord[1] + 1) <  5) : print "lower left"
-    if ((tupCoord[0] - 0) >= 0) and ((tupCoord[1] + 1) <  5) : print "lower"
-    if ((tupCoord[0] + 1) <  5) and ((tupCoord[1] + 1) <  5) : print "lower right"
+    return False
 
 def doBoggleGame(strBoard, lstWords):
-    for strWord in lstWords :
-        nIdx = strBoard.find(strWord[0])
-        if nIdx < 0 : print strWord + " NO"
-        else :
-            print nIdx
-            print tr1Dto2D(nIdx)
-            print tr2Dto1D(tr1Dto2D(nIdx))
+    for strWord in lstWords:
+        fGO = True
+        for C in strWord:
+            if strBoard.find(C) < 0:
+                print "%s NO" % (strWord)
+                fGO = False
+                break
 
+        if fGO :
+            idx = strBoard.find(strWord[0])
+            while (idx > 0):
+                if step(strBoard, idx, strWord, 1) == True:
+                    print "%s YES" % (strWord)
+                    break
+                idx = strBoard.find(strWord[0], idx+1)
 
+            if idx < 0 :
+                print "%s NO" % (strWord)
 
 def main():
     strBoard = ""
     nStageCount = raw_input()
     for i in xrange(0, int(nStageCount)) :
+        strBoard += '0' * gnWidth
         for n in xrange(0, 5) :
+            strBoard += '0'
             strBoard += raw_input()
+            strBoard += '0'
+        strBoard += '0' * gnWidth
 
         lstWords = []
         nWordCount = raw_input()
@@ -56,8 +66,7 @@ def main():
             lstWords.append(raw_input())
 
         doBoggleGame(strBoard, lstWords)
-            
 
 if __name__ == "__main__" :
     main()
-
+    
