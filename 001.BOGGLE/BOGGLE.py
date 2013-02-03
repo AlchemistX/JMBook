@@ -3,29 +3,15 @@ gnWidth = 7
 gnHeight = 7
 lstCoord = [ -gnWidth-1, -gnWidth-0, -gnWidth+1, -1, +1, gnWidth-1, gnWidth+0, gnWidth+1]
 
-def genSquare(strBoard, nIdx):
-    i = 0
-    while(i < 8):
-        nCoord = lstCoord[i]
-        nTarget = nIdx + nCoord
-        yield nTarget, strBoard[nTarget]
-        i += 1
-    return
-
 def step(strBoard, nStart, strWord, nCur):
     if nCur == len(strWord):
         return True
 
-    idx = strBoard.find(strWord[nCur])
-    while (idx > 0):
-        if ( idx != nStart ):
-            for i in lstCoord :
-                if ( idx == (nStart+i) ):
-                   if step(strBoard, idx, strWord, nCur+1) == True:
-                       return True
-                   else:
-                        break
-        idx = strBoard.find(strWord[nCur], idx+1)
+    for delta in lstCoord:
+        idx = nStart + delta
+        if strBoard[idx] == strWord[nCur]:
+            if step(strBoard, idx, strWord, nCur+1) == True:
+                return True
 
     return False
 
@@ -53,6 +39,7 @@ def main():
     strBoard = ""
     nStageCount = raw_input()
     for i in xrange(0, int(nStageCount)) :
+        strBoard =""
         strBoard += '0' * gnWidth
         for n in xrange(0, 5) :
             strBoard += '0'
